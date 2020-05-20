@@ -1,24 +1,8 @@
-import { createApp, ComponentPublicInstance } from 'vue';
+import { ComponentPublicInstance } from 'vue';
 import { ValidationProvider, ValidationObserver } from '@vee-validate/core';
+import { mount } from '@vue/test-utils';
 
-export function mount(component: Record<string, any>) {
-  const app = createApp(component);
-  app.config.devtools = false;
-  // eslint-disable-next-line @typescript-eslint/no-empty-function
-  app.config.warnHandler = () => {};
-  app.config.errorHandler = err => {
-    if ((err as Error).message === 'data is not defined') {
-      return;
-    }
-
-    // eslint-disable-next-line no-console
-    console.error(err);
-  };
-
-  document.body.innerHTML = `<div id="app"></div>`;
-
-  return app.mount('#app');
-}
+export { mount };
 
 export function mountWithHoc(component: Record<string, any>) {
   component.components = {

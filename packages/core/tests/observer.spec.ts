@@ -1,5 +1,5 @@
 import flushPromises from 'flush-promises';
-import { mountWithHoc, setValue } from './helpers';
+import { mountWithHoc } from './helpers';
 
 const DEFAULT_REQUIRED_MESSAGE = (name: string) => `The ${name} field is required`;
 
@@ -12,7 +12,7 @@ test('renders the as prop', () => {
     `,
   });
 
-  expect(wrapper.$el.innerHTML).toBe(`<form novalidate=""></form>`);
+  expect(wrapper.html()).toBe(`<form novalidate=""></form>`);
 });
 
 test('observes the current state of providers', async () => {
@@ -26,18 +26,18 @@ test('observes the current state of providers', async () => {
     `,
   });
 
-  const stateSpan = wrapper.$el.querySelector('#state');
-  const input = wrapper.$el.querySelector('input');
-  setValue(input, '');
+  const stateSpan = wrapper.find('#state');
+  const input = wrapper.find('input');
+  input.setValue('');
 
   await flushPromises();
   // initially the field valid flag is false.
-  expect(stateSpan.textContent).toBe('false');
+  expect(stateSpan.text()).toBe('false');
 
-  setValue(input, 'value');
+  input.setValue('value');
   await flushPromises();
 
-  expect(stateSpan.textContent).toBe('true');
+  expect(stateSpan.text()).toBe('true');
 });
 
 test('submit handler only executes if observer is valid', async () => {
@@ -60,21 +60,21 @@ test('submit handler only executes if observer is valid', async () => {
     `,
   });
 
-  const error = wrapper.$el.querySelector('#error');
-  const input = wrapper.$el.querySelector('input');
+  const error = wrapper.find('#error');
+  const input = wrapper.find('input');
   await flushPromises();
-  expect(error.textContent).toBe('');
+  expect(error.text()).toBe('');
 
-  wrapper.$el.querySelector('button').click();
+  wrapper.find('button').trigger('click');
   await flushPromises();
   expect(calls).toBe(0);
 
-  expect(error.textContent).toBe(DEFAULT_REQUIRED_MESSAGE('field'));
-  setValue(input, '12');
-  wrapper.$el.querySelector('button').click();
+  expect(error.text()).toBe(DEFAULT_REQUIRED_MESSAGE('field'));
+  input.setValue('12');
+  wrapper.find('button').trigger('click');
   await flushPromises();
 
-  expect(error.textContent).toBe('');
+  expect(error.text()).toBe('');
   expect(calls).toBe(1);
 });
 
@@ -99,18 +99,18 @@ test('handles reset', async () => {
     `,
   });
 
-  const error = wrapper.$el.querySelector('#error');
-  expect(error.textContent).toBe('');
+  const error = wrapper.find('#error');
+  expect(error.text()).toBe('');
 
-  wrapper.$el.querySelector('#submit').click();
+  wrapper.find('#submit').trigger('click');
   await flushPromises();
 
-  expect(error.textContent).toBe(DEFAULT_REQUIRED_MESSAGE('field'));
+  expect(error.text()).toBe(DEFAULT_REQUIRED_MESSAGE('field'));
 
-  wrapper.$el.querySelector('#reset').click();
+  wrapper.find('#reset').trigger('click');
   await flushPromises();
 
-  expect(error.textContent).toBe('');
+  expect(error.text()).toBe('');
   expect(isReset).toBe(true);
 });
 
@@ -134,17 +134,17 @@ test('disabled fields do not participate in validation', async () => {
     `,
   });
 
-  const input = wrapper.$el.querySelector('input');
-  setValue(input, '123');
-  const button = wrapper.$el.querySelector('#submit');
+  const input = wrapper.find('input');
+  input.setValue('123');
+  const button = wrapper.find('#submit');
 
-  button.click();
+  button.trigger('click');
   await flushPromises();
 
   expect(isInObject).toBe(true);
 
   (wrapper as any).disabled = true;
-  button.click();
+  button.trigger('click');
   await flushPromises();
 
   expect(isInObject).toBe(false);
@@ -169,7 +169,7 @@ test('initial values can be set with initialValues prop', async () => {
     `,
   });
 
-  const input = wrapper.$el.querySelector('input');
+  const input = wrapper.find('input');
 
-  expect(input.value).toBe(initialValues.field);
+  expect(input.element.value).toBe(initialValues.field);
 });

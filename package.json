@@ -23,6 +23,7 @@
     "@types/jest": "^25.2.3",
     "@typescript-eslint/eslint-plugin": "^2.34.0",
     "@typescript-eslint/parser": "^2.34.0",
+    "@vue/test-utils": "^2.0.0-alpha.6",
     "@vuepress/plugin-back-to-top": "^1.4.1",
     "@vuepress/plugin-google-analytics": "^1.4.1",
     "@vuepress/plugin-pwa": "^1.4.1",

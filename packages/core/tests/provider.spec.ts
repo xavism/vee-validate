@@ -1,6 +1,6 @@
 import flushPromises from 'flush-promises';
 import { extend } from '@vee-validate/core';
-import { mountWithHoc, setValue, dispatchEvent } from './helpers';
+import { mountWithHoc } from './helpers';
 
 const DEFAULT_REQUIRED_MESSAGE = (name: string) => `The ${name} field is required`;
 
@@ -11,7 +11,7 @@ test('renders the as prop', () => {
     `,
   });
 
-  expect(wrapper.$el.outerHTML).toBe(`<input name="field">`);
+  expect(wrapper.html()).toBe(`<input name="field">`);
 });
 
 test('listens for input and blur events to set meta flags', async () => {
@@ -26,21 +26,21 @@ test('listens for input and blur events to set meta flags', async () => {
     `,
   });
 
-  const input = wrapper.$el.querySelector('input');
-  const pre = wrapper.$el.querySelector('pre');
+  const input = wrapper.find('input');
+  const pre = wrapper.find('pre');
 
-  expect(pre.textContent).toContain('"untouched": true');
-  expect(pre.textContent).toContain('"pristine": true');
-  dispatchEvent(input, 'blur');
+  expect(pre.text()).toContain('"untouched": true');
+  expect(pre.text()).toContain('"pristine": true');
+  input.trigger('blur');
   await flushPromises();
-  expect(pre.textContent).toContain('"touched": true');
-  expect(pre.textContent).toContain('"untouched": false');
-  expect(pre.textContent).toContain('"pristine": true');
-  dispatchEvent(input, 'input');
+  expect(pre.text()).toContain('"touched": true');
+  expect(pre.text()).toContain('"untouched": false');
+  expect(pre.text()).toContain('"pristine": true');
+  input.trigger('input');
   await flushPromises();
   // eslint-disable-next-line jest/valid-expect
-  expect(pre.textContent).toContain('"pristine": false');
-  expect(pre.textContent).toContain('"dirty": true');
+  expect(pre.text()).toContain('"pristine": false');
+  expect(pre.text()).toContain('"dirty": true');
 });
 
 test('listens for change events', async () => {
@@ -56,18 +56,18 @@ test('listens for change events', async () => {
     `,
   });
 
-  const select = wrapper.$el.querySelector('select');
-  const error = wrapper.$el.querySelector('#error');
+  const select = wrapper.find('select');
+  const error = wrapper.find('#error');
 
-  setValue(select, '');
+  select.setValue('');
   await flushPromises();
   // validation triggered on change.
-  expect(error.textContent).toBe(DEFAULT_REQUIRED_MESSAGE('select'));
+  expect(error.text()).toBe(DEFAULT_REQUIRED_MESSAGE('select'));
 
-  setValue(select, '1');
+  select.setValue('1');
   await flushPromises();
 
-  expect(error.textContent).toBe('');
+  expect(error.text()).toBe('');
 });
 
 test('validates initially with immediate prop', async () => {
@@ -82,12 +82,12 @@ test('validates initially with immediate prop', async () => {
     `,
   });
 
-  const error = wrapper.$el.querySelector('#error');
+  const error = wrapper.find('#error');
 
   // flush the pending validation.
   await flushPromises();
 
-  expect(error.textContent).toContain(DEFAULT_REQUIRED_MESSAGE('field'));
+  expect(error.text()).toContain(DEFAULT_REQUIRED_MESSAGE('field'));
 });
 
 test('watches rules and re-validates', async () => {
@@ -107,13 +107,13 @@ test('watches rules and re-validates', async () => {
       `,
   });
 
-  const input = wrapper.$el.querySelector('input');
-  const error = wrapper.$el.querySelector('#error');
-  setValue(input, '1');
+  const input = wrapper.find('input');
+  const error = wrapper.find('#error');
+  input.setValue('1');
   // flush the pending validation.
   await flushPromises();
 
-  expect(error.textContent).toBe('');
+  expect(error.text()).toBe('');
 
   (wrapper as any).rules = {
     required: false,
@@ -121,7 +121,7 @@ test('watches rules and re-validates', async () => {
   };
 
   await flushPromises();
-  expect(error.textContent).toBe('The field field must be at least 3 characters');
+  expect(error.text()).toBe('The field field must be at least 3 characters');
 });
 
 test('validates custom components', async () => {
@@ -146,19 +146,19 @@ test('validates custom components', async () => {
       `,
   });
 
-  const error = wrapper.$el.querySelector('#error');
-  const input = wrapper.$el.querySelector('#input');
+  const error = wrapper.find('#error');
+  const input = wrapper.find('#input');
 
-  expect(error.textContent).toBe('');
+  expect(error.text()).toBe('');
 
-  setValue(input, '');
+  input.setValue('');
   await flushPromises();
 
-  expect(error.textContent).toBe(DEFAULT_REQUIRED_MESSAGE('field'));
+  expect(error.text()).toBe(DEFAULT_REQUIRED_MESSAGE('field'));
 
-  setValue(input, 'val');
+  input.setValue('val');
   await flushPromises();
-  expect(error.textContent).toBe('');
+  expect(error.text()).toBe('');
 });
 
 test('validates target fields using targeted params', async () => {
@@ -175,27 +175,27 @@ test('validates target fields using targeted params', async () => {
     `,
   });
 
-  const error = wrapper.$el.querySelector('#err');
-  const inputs = wrapper.$el.querySelectorAll('input');
+  const error = wrapper.find('#err');
+  const inputs = wrapper.findAll('input');
 
-  expect(error.textContent).toBeFalsy();
-  setValue(inputs[0], 'val');
+  expect(error.text()).toBeFalsy();
+  inputs[0].setValue('val');
   await flushPromises();
   // the password input hasn't changed yet.
-  expect(error.textContent).toBeFalsy();
-  setValue(inputs[1], '12');
+  expect(error.text()).toBeFalsy();
+  inputs[1].setValue('12');
   await flushPromises();
   // the password input was interacted with and should be validated.
-  expect(error.textContent).toBeTruthy();
+  expect(error.text()).toBeTruthy();
 
-  setValue(inputs[1], 'val');
+  inputs[1].setValue('val');
   await flushPromises();
   // the password input now matches the confirmation.
-  expect(error.textContent).toBeFalsy();
+  expect(error.text()).toBeFalsy();
 
-  setValue(inputs[0], 'val1');
+  inputs[0].setValue('val1');
   await flushPromises();
-  expect(error.textContent).toBeTruthy();
+  expect(error.text()).toBeTruthy();
 });
 
 test('validates file input', async () => {
@@ -210,12 +210,12 @@ test('validates file input', async () => {
     `,
   });
 
-  const input = wrapper.$el.querySelector('input');
-  dispatchEvent(input, 'change');
+  const input = wrapper.find('input');
+  input.trigger('change');
   await flushPromises();
 
-  const error = wrapper.$el.querySelector('#error');
-  expect(error.textContent).toBeTruthy();
+  const error = wrapper.find('#error');
+  expect(error.text()).toBeTruthy();
 });
 
 test('setting bails prop to false disables fast exit', async () => {
@@ -230,14 +230,14 @@ test('setting bails prop to false disables fast exit', async () => {
     `,
   });
 
-  const input = wrapper.$el.querySelector('input');
-  setValue(input, '1');
+  const input = wrapper.find('input');
+  input.setValue('1');
   await flushPromises();
 
-  const errors = wrapper.$el.querySelectorAll('p');
+  const errors = wrapper.findAll('p');
   expect(errors).toHaveLength(2);
-  expect(errors[0].textContent).toBe('The field field must be a valid email');
-  expect(errors[1].textContent).toBe('The field field must be at least 3 characters');
+  expect(errors[0].text()).toBe('The field field must be a valid email');
+  expect(errors[1].text()).toBe('The field field must be at least 3 characters');
 });
 
 const sleep = (wait: number) => new Promise(resolve => setTimeout(resolve, wait));
@@ -254,15 +254,15 @@ test.skip('validation can be debounced', async () => {
     `,
   });
 
-  const input = wrapper.$el.querySelector('input');
-  const error = wrapper.$el.querySelector('p');
+  const input = wrapper.find('input');
+  const error = wrapper.find('p');
 
-  setValue(input, '');
+  input.setValue('');
   await sleep(40);
-  expect(error.textContent).toBe('');
+  expect(error.text()).toBe('');
   await sleep(10);
   await flushPromises();
-  expect(error.textContent).toBe(DEFAULT_REQUIRED_MESSAGE('field'));
+  expect(error.text()).toBe(DEFAULT_REQUIRED_MESSAGE('field'));
 });
 
 test('avoids race conditions between successive validations', async () => {
@@ -289,16 +289,16 @@ test('avoids race conditions between successive validations', async () => {
     `,
   });
 
-  const input = wrapper.$el.querySelector('input');
-  const error = wrapper.$el.querySelector('p');
+  const input = wrapper.find('input');
+  const error = wrapper.find('p');
 
-  setValue(input, '123');
-  setValue(input, '12');
-  setValue(input, '');
+  input.setValue('123');
+  input.setValue('12');
+  input.setValue('');
   await sleep(100);
   await flushPromises();
   // LAST message should be the required one.
-  expect(error.textContent).toBe(DEFAULT_REQUIRED_MESSAGE('field'));
+  expect(error.text()).toBe(DEFAULT_REQUIRED_MESSAGE('field'));
 });
 
 test('resets validation state using reset method in slot scope data', async () => {
@@ -314,17 +314,17 @@ test('resets validation state using reset method in slot scope data', async () =
     `,
   });
 
-  const error = wrapper.$el.querySelector('#error');
-  const input = wrapper.$el.querySelector('input');
+  const error = wrapper.find('#error');
+  const input = wrapper.find('input');
 
-  expect(error.textContent).toBe('');
+  expect(error.text()).toBe('');
 
-  setValue(input, '');
+  input.setValue('');
   await flushPromises();
 
-  expect(error.textContent).toBe(DEFAULT_REQUIRED_MESSAGE('field'));
+  expect(error.text()).toBe(DEFAULT_REQUIRED_MESSAGE('field'));
 
-  wrapper.$el.querySelector('button').click();
+  wrapper.find('button').element.click();
   await flushPromises();
-  expect(error.textContent).toBe('');
+  expect(error.text()).toBe('');
 });

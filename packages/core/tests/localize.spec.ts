@@ -1,6 +1,6 @@
 import flushPromises from 'flush-promises';
 import { localize, extend } from '@vee-validate/core';
-import { mountWithHoc, setValue } from './helpers';
+import { mountWithHoc } from './helpers';
 
 test('can define new locales', async () => {
   localize('ar', {
@@ -20,12 +20,12 @@ test('can define new locales', async () => {
     `,
   });
 
-  const error = wrapper.$el.querySelector('#error');
+  const error = wrapper.find('#error');
 
   // flush the pending validation.
   await flushPromises();
 
-  expect(error.textContent).toContain('هذا الحقل مطلوب');
+  expect(error.text()).toContain('هذا الحقل مطلوب');
 });
 
 test('can define specific messages for specific fields', async () => {
@@ -54,11 +54,11 @@ test('can define specific messages for specific fields', async () => {
   });
 
   await flushPromises();
-  const errors = wrapper.$el.querySelectorAll('.error');
+  const errors = wrapper.findAll('.error');
   expect(errors).toHaveLength(2);
 
-  expect(errors[0].textContent).toContain('WRONG!');
-  expect(errors[1].textContent).toContain('The name field is required');
+  expect(errors[0].text()).toContain('WRONG!');
+  expect(errors[1].text()).toContain('The name field is required');
 });
 
 test('can merge locales without setting the current one', async () => {
@@ -81,12 +81,12 @@ test('can merge locales without setting the current one', async () => {
       `,
   });
 
-  const error = wrapper.$el.querySelector('#error');
+  const error = wrapper.find('#error');
   // flush the pending validation.
   await flushPromises();
 
   // locale wasn't set.
-  expect(error.textContent).toContain('The field field is required');
+  expect(error.text()).toContain('The field field is required');
 });
 
 test('falls back to the default message if rule without message exists', async () => {
@@ -103,10 +103,10 @@ test('falls back to the default message if rule without message exists', async (
     `,
   });
 
-  const error = wrapper.$el.querySelector('#error');
-  const input = wrapper.$el.querySelector('input');
-  setValue(input, '12');
+  const error = wrapper.find('#error');
+  const input = wrapper.find('input');
+  input.setValue('12');
   await flushPromises();
 
-  expect(error.textContent).toContain('field is not valid');
+  expect(error.text()).toContain('field is not valid');
 });
