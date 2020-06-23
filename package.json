@@ -1,5 +1,5 @@
 {
-  "name": "vee-validate",
+  "name": "@xavism/vee-validate",
   "version": "3.3.3",
   "description": "Template Based Validation Framework for Vue.js",
   "author": "Abdelrahman Awad <logaretm1@gmail.com>",
@@ -9,7 +9,10 @@
   "main": "dist/vee-validate.js",
   "types": "dist/types/index.d.ts",
   "homepage": "https://logaretm.github.io/vee-validate/",
-  "repository": "https://github.com/logaretm/vee-validate",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/logaretm/vee-validate.git"
+  },
   "scripts": {
     "test": "jest",
     "lint": "eslint **/*.{js,jsx,ts,tsx} --fix",
@@ -19,9 +22,9 @@
     "build:locale": "node scripts/locale.js",
     "build:main": "node scripts/main.js",
     "ts:defs": "node scripts/definitions.js",
-    "build": "npm run build:main && npm run ts:defs && npm run build:locale",
+    "build": "npm run build:main && npm run build:locale",
     "cover": "jest --coverage",
-    "prepublishOnly": "npm run build && npm run ts:defs"
+    "prepublishOnly": "npm run build"
   },
   "keywords": [
     "VueJS",
@@ -97,12 +100,6 @@
     "locale",
     "dist"
   ],
-  "husky": {
-    "hooks": {
-      "pre-commit": "lint-staged",
-      "commit-msg": "commitlint --edit -E HUSKY_GIT_PARAMS"
-    }
-  },
   "lint-staged": {
     "*.ts": [
       "eslint --fix",
